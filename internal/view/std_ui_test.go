@@ -25,7 +25,7 @@ func TestStdUI_RenderInfo(t *testing.T) {
 
 	w.Close()
 	var buf bytes.Buffer
-	io.Copy(&buf, r)
+	_, _ = io.Copy(&buf, r)
 
 	// And
 	if !strings.Contains(buf.String(), "hello info\n") {
@@ -48,7 +48,7 @@ func TestStdUI_RenderError(t *testing.T) {
 
 	w.Close()
 	var buf bytes.Buffer
-	io.Copy(&buf, r)
+	_, _ = io.Copy(&buf, r)
 
 	// And
 	if !strings.Contains(buf.String(), "hello error\n") {
@@ -64,7 +64,7 @@ func TestStdUI_RenderQuestion(t *testing.T) {
 	ui := NewStdUI(inR, outW, os.Stderr)
 
 	go func() {
-		inW.WriteString("y\n")
+		_, _ = inW.WriteString("y\n")
 		inW.Close()
 	}()
 
@@ -83,7 +83,7 @@ func TestStdUI_RenderQuestion(t *testing.T) {
 	}
 
 	var outBuf bytes.Buffer
-	io.Copy(&outBuf, outR)
+	_, _ = io.Copy(&outBuf, outR)
 	
 	// And
 	if !strings.Contains(outBuf.String(), "Are you sure?") {
@@ -102,11 +102,11 @@ func TestStdUI_RenderInputs(t *testing.T) {
 
 	go func() {
 		// opt_input is asked first (sorted by key): Provide empty value
-		inW.WriteString("\n")
+		_, _ = inW.WriteString("\n")
 		// req_input is asked second: Provide empty value (triggers error and re-prompt)
-		inW.WriteString("\n")
+		_, _ = inW.WriteString("\n")
 		// req_input asked third: Provide valid value
-		inW.WriteString("valid-val\n")
+		_, _ = inW.WriteString("valid-val\n")
 		inW.Close()
 	}()
 
@@ -142,7 +142,7 @@ func TestStdUI_RenderInputs(t *testing.T) {
 	}
 
 	var errBuf bytes.Buffer
-	io.Copy(&errBuf, errR)
+	_, _ = io.Copy(&errBuf, errR)
 	
 	// And
 	if !strings.Contains(errBuf.String(), "is required. Please provide a value") {

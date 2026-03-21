@@ -28,7 +28,7 @@ func TestProcessor_CreateTemplate(t *testing.T) {
 			name: "valid config file",
 			setupDest: func(t *testing.T, dest string) {
 				config := `name: test-project`
-				os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(config), 0644)
+				_ = os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(config), 0644)
 			},
 			wantNil:  false,
 			wantErr:  false,
@@ -38,7 +38,7 @@ func TestProcessor_CreateTemplate(t *testing.T) {
 			name: "invalid config file",
 			setupDest: func(t *testing.T, dest string) {
 				config := `name: [invalid yaml`
-				os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(config), 0644)
+				_ = os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(config), 0644)
 			},
 			wantNil: true,
 			wantErr: true,
@@ -88,15 +88,15 @@ func TestProcessor_ApplyTemplate(t *testing.T) {
 		dest := t.TempDir()
 
 		// Setup .skelly.yaml
-		os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(""), 0644)
+		_ = os.WriteFile(filepath.Join(dest, TemplateConfigName), []byte(""), 0644)
 
 		// Setup .git dir to be skipped
 		gitDir := filepath.Join(dest, ".git")
-		os.MkdirAll(gitDir, 0755)
-		os.WriteFile(filepath.Join(gitDir, "ignore.txt"), []byte("ignored"), 0644)
+		_ = os.MkdirAll(gitDir, 0755)
+		_ = os.WriteFile(filepath.Join(gitDir, "ignore.txt"), []byte("ignored"), 0644)
 
 		// Setup a template file
-		os.WriteFile(filepath.Join(dest, "{{.Name}}.txt"), []byte("Hello {{.Name}}!"), 0644)
+		_ = os.WriteFile(filepath.Join(dest, "{{.Name}}.txt"), []byte("Hello {{.Name}}!"), 0644)
 
 		// Create a config
 		cfg := ProjectTemplate{

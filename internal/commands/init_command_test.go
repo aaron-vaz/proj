@@ -21,12 +21,12 @@ func (m *mockDownloader) Get(ctx context.Context, source string, destination str
 		return m.err
 	}
 	// Create a dummy config in destination
-	os.MkdirAll(destination, 0755)
+	_ = os.MkdirAll(destination, 0755)
 	configYaml := `
 name: "test-template"
 description: "A test template"
 `
-	os.WriteFile(filepath.Join(destination, templates.TemplateConfigName), []byte(configYaml), 0644)
+	_ = os.WriteFile(filepath.Join(destination, templates.TemplateConfigName), []byte(configYaml), 0644)
 	return nil
 }
 
@@ -80,7 +80,7 @@ func TestInitCommand_Run(t *testing.T) {
 				cmd := NewInitCommand(proc, &mockDownloader{err: errors.New("download failed")}, ui)
 				flags := flag.NewFlagSet("init", flag.ContinueOnError)
 				cmd.Init(flags)
-				flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
+				_ = flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
 				return cmd.(*InitCommand)
 			},
 			args:    []string{},
@@ -96,7 +96,7 @@ func TestInitCommand_Run(t *testing.T) {
 				cmd := NewInitCommand(proc, &mockDownloader{}, ui)
 				flags := flag.NewFlagSet("init", flag.ContinueOnError)
 				cmd.Init(flags)
-				flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
+				_ = flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
 				return cmd.(*InitCommand)
 			},
 			preSetupDest: true,
@@ -115,7 +115,7 @@ func TestInitCommand_Run(t *testing.T) {
 				cmd := NewInitCommand(proc, &mockDownloader{}, ui)
 				flags := flag.NewFlagSet("init", flag.ContinueOnError)
 				cmd.Init(flags)
-				flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
+				_ = flags.Parse([]string{"-src", "http://example.com/template", "-dst", filepath.Join(tempDir, "dest")})
 				return cmd.(*InitCommand)
 			},
 			args:    []string{},
@@ -128,7 +128,7 @@ func TestInitCommand_Run(t *testing.T) {
 			// Given
 			tempDir := t.TempDir()
 			if tt.preSetupDest {
-				os.MkdirAll(filepath.Join(tempDir, "dest"), 0755)
+				_ = os.MkdirAll(filepath.Join(tempDir, "dest"), 0755)
 			}
 
 			cmd := tt.setupCmd(tempDir)

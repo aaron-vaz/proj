@@ -17,10 +17,14 @@ var (
 	dirsToSkip    = []string{".git"}
 )
 
+// Processor oversees the orchestration of template parsing, extracting configs,
+// and invoking renderers against template directories.
 type Processor struct {
 	renderer *RendererService
 }
 
+// CreateTemplate reads the local configuration file located in the fetched template
+// destination, unmarshaling it into a ProjectTemplate struct.
 func (p *Processor) CreateTemplate(destination string) (*ProjectTemplate, error) {
 	configBytes, err := os.ReadFile(filepath.Join(destination, TemplateConfigName))
 	if err != nil {
@@ -38,6 +42,8 @@ func (p *Processor) CreateTemplate(destination string) (*ProjectTemplate, error)
 	return &config, nil
 }
 
+// ApplyTemplate traverses the downloaded template project, executing two phases:
+// executing file contents as text templates, and renaming files dynamically.
 func (p *Processor) ApplyTemplate(config ProjectTemplate, destination string) error {
 	// Skip certain paths
 	// easier to do this by deleting them before processing
@@ -56,8 +62,9 @@ func (p *Processor) ApplyTemplate(config ProjectTemplate, destination string) er
 			return err
 		}
 
-		// Skip directories, That will be handled in phase 2
-		if d.IsDir() {
+		// Skip directories (and symlinks to directories), That will be handled in phase 2
+		stat, statErr := os.Stat(path)
+		if statErr == nil && stat.IsDir() {
 			return nil
 		}
 
@@ -110,6 +117,7 @@ func (p *Processor) ApplyTemplate(config ProjectTemplate, destination string) er
 	return os.Remove(filepath.Join(destination, TemplateConfigName))
 }
 
+// NewTemplateProcessor instantiates a Processor equipped with a RendererService.
 func NewTemplateProcessor(renderer *RendererService) *Processor {
 	return &Processor{
 		renderer: renderer,

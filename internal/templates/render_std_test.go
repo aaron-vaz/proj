@@ -24,7 +24,7 @@ func TestStdRenderer_RenderFile(t *testing.T) {
 		// Given
 		dest := t.TempDir()
 		tmplPath := filepath.Join(dest, "{{.Name}}_test.txt")
-		os.WriteFile(tmplPath, []byte(""), 0644)
+		_ = os.WriteFile(tmplPath, []byte(""), 0644)
 
 		// When
 		newPath, err := r.RenderFile(cfg, tmplPath)
@@ -50,7 +50,7 @@ func TestStdRenderer_RenderFile(t *testing.T) {
 		// Given
 		dest := t.TempDir()
 		tmplPath := filepath.Join(dest, "{{.Name_test.txt") // unclosed brace
-		os.WriteFile(tmplPath, []byte(""), 0644)
+		_ = os.WriteFile(tmplPath, []byte(""), 0644)
 
 		// When
 		_, err := r.RenderFile(cfg, tmplPath)
@@ -70,7 +70,7 @@ func TestStdRenderer_RenderFileContents(t *testing.T) {
 		// Given
 		dest := t.TempDir()
 		filePath := filepath.Join(dest, "test.txt")
-		os.WriteFile(filePath, []byte("Name is {{.Name}}"), 0644)
+		_ = os.WriteFile(filePath, []byte("Name is {{.Name}}"), 0644)
 
 		// When
 		err := r.RenderFileContents(cfg, filePath)
@@ -91,15 +91,14 @@ func TestStdRenderer_RenderFileContents(t *testing.T) {
 		// Given
 		dest := t.TempDir()
 		filePath := filepath.Join(dest, "test.txt")
-		os.WriteFile(filePath, []byte("Name is {{.NonExistentField}}"), 0644)
+		_ = os.WriteFile(filePath, []byte("Name is {{.NonExistentField}}"), 0644)
 
 		// When
-		err := r.RenderFileContents(cfg, filePath)
 		// text/template might not error on missing fields unless strict mode, actually it does if field doesn't exist on struct.
 		// Wait, ProjectTemplate has no NonExistentField, text/template will emit <no value> or error out.
 		// Let's test with a syntax error instead to guarantee failure
-		os.WriteFile(filePath, []byte("Name is {{."), 0644)
-		err = r.RenderFileContents(cfg, filePath)
+		_ = os.WriteFile(filePath, []byte("Name is {{."), 0644)
+		err := r.RenderFileContents(cfg, filePath)
 		
 		// Then
 		if err == nil {
