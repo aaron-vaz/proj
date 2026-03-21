@@ -25,7 +25,7 @@ func (i *FlagCommandInvoker) Execute(args []string) error {
 		return fmt.Errorf("unknown command: %s", cmdName)
 	}
 
-	flags := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
+	flags := flag.NewFlagSet(cmd.Name(), flag.ContinueOnError)
 	cmd.Init(flags)
 
 	if err := flags.Parse(args[1:]); err != nil {
