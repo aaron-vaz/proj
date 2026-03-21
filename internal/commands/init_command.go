@@ -14,6 +14,8 @@ import (
 	"github.com/aaron-vaz/skelly/internal/view"
 )
 
+const defaultDestination = "."
+
 // InitOptions holds the parsed flag inputs for the init command.
 type InitOptions struct {
 	source      string
@@ -41,7 +43,7 @@ func (c *InitCommand) Description() string {
 // Init binds the required configuration flags to the InitCommand's options.
 func (c *InitCommand) Init(flags *flag.FlagSet) {
 	flags.StringVar(&c.options.source, "src", "", "URL to template that will be used to init the new project (required)")
-	flags.StringVar(&c.options.destination, "dst", ".", "Destination dir where the project will be initialised to (Defaults to current directory)")
+	flags.StringVar(&c.options.destination, "dst", defaultDestination, "Destination dir where the project will be initialised to (Defaults to current directory)")
 }
 
 // Run executes the template initialization, checking the destination,
@@ -67,9 +69,9 @@ func (c *InitCommand) Run(args []string) error {
 			return c.ui.RenderInfo("Exiting....")
 		}
 
-		// If yes we can delete the destination contents, taking care to not delete '.' itself
+		// If yes we can delete the destination contents, taking care to not delete defaultDestination itself
 		cleanedDest := filepath.Clean(c.options.destination)
-		if cleanedDest == "." {
+		if cleanedDest == defaultDestination {
 			entries, err := os.ReadDir(cleanedDest)
 			if err != nil {
 				return fmt.Errorf("failed to read destination directory: %w", err)
