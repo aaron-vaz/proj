@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/aaron-vaz/skelly/compare/v0.2.0...v0.3.0) (2026-03-21)
+
+
+### Features
+
+* implement BDD tests, refactor downloader, and fix overwrite crash ([83e3181](https://github.com/aaron-vaz/skelly/commit/83e318190cc1ff31724453079e0a3ada269fd5bd))
+
 ## [0.2.1](https://github.com/aaron-vaz/skelly/compare/v0.2.0...v0.2.1) (2026-03-21)
 
 
