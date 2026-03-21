@@ -10,12 +10,15 @@ import (
 	"github.com/aaron-vaz/skelly/internal/templates"
 )
 
+// StdUI is a standard I/O implementation of the UI interface, facilitating
+// interaction with the user via os streams.
 type StdUI struct {
 	stdin  *bufio.Scanner
 	stdout *os.File
 	stderr *os.File
 }
 
+// RenderInputs interactively prompts the user for all parameters defined in the template config.
 func (s *StdUI) RenderInputs(inputs map[string]templates.Input) error {
 	// No need to render if there are no inputs defined in the config
 	// this is not an error, just a no-op
@@ -48,6 +51,7 @@ func (s *StdUI) RenderInputs(inputs map[string]templates.Input) error {
 	return nil
 }
 
+// RenderQuestion poses a question to the user and awaits a formatted string response.
 func (s *StdUI) RenderQuestion(question string, options []string) (string, error) {
 	_, err := fmt.Fprintf(s.stdout, "%s? [%s]\n", question, strings.Join(options, "/"))
 	if err != nil {
@@ -111,6 +115,7 @@ func (s *StdUI) waitForUserInput() (string, error) {
 	return s.stdin.Text(), s.stdin.Err()
 }
 
+// NewStdUI returns a ready-to-use StdUI backed by the provided file descriptors.
 func NewStdUI(stdin *os.File, stdout *os.File, stderr *os.File) UI {
 	return &StdUI{
 		stdin:  bufio.NewScanner(stdin),

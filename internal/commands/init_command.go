@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/aaron-vaz/skelly/internal/download"
@@ -13,11 +14,16 @@ import (
 	"github.com/aaron-vaz/skelly/internal/view"
 )
 
+const defaultDestination = "."
+
+// InitOptions holds the parsed flag inputs for the init command.
 type InitOptions struct {
 	source      string
 	destination string
 }
 
+// InitCommand encapsulates the logic required to download, process,
+// and generate a new project from a specified template source.
 type InitCommand struct {
 	processor  *templates.Processor
 	downloader download.Downloader
@@ -25,6 +31,7 @@ type InitCommand struct {
 	options    InitOptions
 }
 
+// Name returns the CLI identifier for this command.
 func (c *InitCommand) Name() string {
 	return "init"
 }
@@ -33,11 +40,14 @@ func (c *InitCommand) Description() string {
 	return "Initialize a new project from a template"
 }
 
+// Init binds the required configuration flags to the InitCommand's options.
 func (c *InitCommand) Init(flags *flag.FlagSet) {
 	flags.StringVar(&c.options.source, "src", "", "URL to template that will be used to init the new project (required)")
-	flags.StringVar(&c.options.destination, "dst", ".", "Destination dir where the project will be initialised to (Defaults to current directory)")
+	flags.StringVar(&c.options.destination, "dst", defaultDestination, "Destination dir where the project will be initialised to (Defaults to current directory)")
 }
 
+// Run executes the template initialization, checking the destination,
+// downloading the remote source, asking user inputs, and applying the generator.
 func (c *InitCommand) Run(args []string) error {
 	if err := c.validateOptions(); err != nil {
 		return fmt.Errorf("invalid options: %w", err)
@@ -59,9 +69,22 @@ func (c *InitCommand) Run(args []string) error {
 			return c.ui.RenderInfo("Exiting....")
 		}
 
-		// If yes we can delete the destination
-		if err = os.RemoveAll(c.options.destination); err != nil {
-			return fmt.Errorf("failed to clean destination directory: %w", err)
+		// If yes we can delete the destination contents, taking care to not delete defaultDestination itself
+		cleanedDest := filepath.Clean(c.options.destination)
+		if cleanedDest == defaultDestination {
+			entries, err := os.ReadDir(cleanedDest)
+			if err != nil {
+				return fmt.Errorf("failed to read destination directory: %w", err)
+			}
+			for _, e := range entries {
+				if err := os.RemoveAll(filepath.Join(cleanedDest, e.Name())); err != nil {
+					return fmt.Errorf("failed to clean destination directory: %w", err)
+				}
+			}
+		} else {
+			if err = os.RemoveAll(c.options.destination); err != nil {
+				return fmt.Errorf("failed to clean destination directory: %w", err)
+			}
 		}
 	}
 
@@ -101,6 +124,8 @@ func (c *InitCommand) validateOptions() error {
 	return nil
 }
 
+// NewInitCommand constructs a new InitCommand initialized with the necessary
+// template parsing, downloading, and UI rendering components.
 func NewInitCommand(
 	processor *templates.Processor,
 	downloader download.Downloader,

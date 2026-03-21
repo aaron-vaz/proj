@@ -4,3 +4,4 @@ skelly-test.zip
 test-location
 # Build artifacts
 build/
+coverage.out
