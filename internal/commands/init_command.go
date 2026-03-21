@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/aaron-vaz/skelly/internal/download"
@@ -66,9 +67,22 @@ func (c *InitCommand) Run(args []string) error {
 			return c.ui.RenderInfo("Exiting....")
 		}
 
-		// If yes we can delete the destination
-		if err = os.RemoveAll(c.options.destination); err != nil {
-			return fmt.Errorf("failed to clean destination directory: %w", err)
+		// If yes we can delete the destination contents, taking care to not delete '.' itself
+		cleanedDest := filepath.Clean(c.options.destination)
+		if cleanedDest == "." {
+			entries, err := os.ReadDir(cleanedDest)
+			if err != nil {
+				return fmt.Errorf("failed to read destination directory: %w", err)
+			}
+			for _, e := range entries {
+				if err := os.RemoveAll(filepath.Join(cleanedDest, e.Name())); err != nil {
+					return fmt.Errorf("failed to clean destination directory: %w", err)
+				}
+			}
+		} else {
+			if err = os.RemoveAll(c.options.destination); err != nil {
+				return fmt.Errorf("failed to clean destination directory: %w", err)
+			}
 		}
 	}
 
