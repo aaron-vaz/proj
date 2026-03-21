@@ -10,10 +10,14 @@ import (
 	"github.com/aaron-vaz/skelly/internal/view"
 )
 
+// FlagCommandInvoker is an implementation of commands.Invoker that maps
+// CLI commands to their respective handlers and parses flag inputs.
 type FlagCommandInvoker struct {
 	commands map[string]commands.Command[*flag.FlagSet]
 }
 
+// Execute parses the provided arguments, determines the target command,
+// parses associated flags, and executes the command's Run logic.
 func (i *FlagCommandInvoker) Execute(args []string) error {
 	if len(args) < 1 {
 		return i.commands["help"].Run(nil)
@@ -25,7 +29,7 @@ func (i *FlagCommandInvoker) Execute(args []string) error {
 		return fmt.Errorf("unknown command: %s", cmdName)
 	}
 
-	flags := flag.NewFlagSet(cmd.Name(), flag.ExitOnError)
+	flags := flag.NewFlagSet(cmd.Name(), flag.ContinueOnError)
 	cmd.Init(flags)
 
 	if err := flags.Parse(args[1:]); err != nil {
@@ -35,6 +39,8 @@ func (i *FlagCommandInvoker) Execute(args []string) error {
 	return cmd.Run(flags.Args())
 }
 
+// NewFlagCommandInvoker creates and configures a new FlagCommandInvoker with
+// all supported CLI commands registered automatically.
 func NewFlagCommandInvoker(
 	downloader download.Downloader,
 	processor *templates.Processor,

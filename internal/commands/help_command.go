@@ -5,10 +5,12 @@ import (
 	"fmt"
 )
 
+// HelpCommand handles the display of usage instructions and command descriptions.
 type HelpCommand struct {
 	commands map[string]Command[*flag.FlagSet]
 }
 
+// Name returns the CLI identifier for this command.
 func (c *HelpCommand) Name() string {
 	return "help"
 }
@@ -19,6 +21,8 @@ func (c *HelpCommand) Description() string {
 
 func (c *HelpCommand) Init(flags *flag.FlagSet) {}
 
+// Run prints the application help structure or the specific help documentation
+// for a requested sub-command.
 func (c *HelpCommand) Run(args []string) error {
 	if len(args) == 0 {
 		c.showHelp()
@@ -55,6 +59,8 @@ func (c *HelpCommand) showHelp() {
 	fmt.Println("Run 'skelly help COMMAND' for command-specific help")
 }
 
+// NewHelpCommand returns a configured HelpCommand that understands the
+// full map of available commands in order to print their documentation.
 func NewHelpCommand(commands map[string]Command[*flag.FlagSet]) Command[*flag.FlagSet] {
 	return &HelpCommand{
 		commands: commands,

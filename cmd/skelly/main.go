@@ -18,7 +18,10 @@ func main() {
 }
 
 func run() error {
-	downloader := download.NewGoGetterDownloader()
+	downloader := download.NewSmartDownloader(
+		download.NewLocalDownloader(),
+		download.NewGoGetterDownloader(),
+	)
 	renderer := templates.NewRendererService()
 	processor := templates.NewTemplateProcessor(renderer)
 	ui := view.NewStdUI(os.Stdin, os.Stdout, os.Stderr)

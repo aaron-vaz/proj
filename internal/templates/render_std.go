@@ -6,12 +6,15 @@ import (
 	"text/template"
 )
 
+// StdRenderer implements the generic text/template behavior renderer.
 type StdRenderer struct{}
 
+// Supports always returns true as this is the universally active default fallback.
 func (r *StdRenderer) Supports(config ProjectTemplate) bool {
 	return true
 }
 
+// RenderFile executes standard Go templating against a file's name for dynamic structural renaming.
 func (r *StdRenderer) RenderFile(config ProjectTemplate, path string) (string, error) {
 	tmpl, err := template.New(path).Parse(path)
 	if err != nil {
@@ -36,6 +39,8 @@ func (r *StdRenderer) RenderFile(config ProjectTemplate, path string) (string, e
 	return rPath.String(), nil
 }
 
+// RenderFileContents reads, applies Go templates across a file's entire body,
+// and effectively rewrites it directly while preserving original file modes.
 func (r *StdRenderer) RenderFileContents(config ProjectTemplate, path string) error {
 	// Get file info for permissions
 	info, err := os.Stat(path)
